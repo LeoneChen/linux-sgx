@@ -1,0 +1,240 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(SampleSGXSan clang++ lto) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/llvm/bin/clang++",
+            "args": [
+                "-fuse-ld=lld",
+                "-Wl,-mllvm=-load=/home/leone/文档/linux-sgx/SGXSan/output/libSensitiveLeakSanPass.so",
+                "-Wl,-mllvm=-load=/home/leone/文档/linux-sgx/SGXSan/output/libSGXSanPass.so",
+                "Enclave/Enclave_t.o",
+                "Enclave/Edger8rSyntax/Arrays.o",
+                "Enclave/Edger8rSyntax/EdgeCheckPtr.o",
+                "Enclave/Edger8rSyntax/Functions.o",
+                "Enclave/Edger8rSyntax/Pointers.o",
+                "Enclave/Edger8rSyntax/SLSTest.o",
+                "Enclave/Edger8rSyntax/Types.o",
+                "Enclave/Enclave.o",
+                "Enclave/TrustedLibrary/Libc.o",
+                "Enclave/TrustedLibrary/Libcxx.o",
+                "Enclave/TrustedLibrary/Thread.o",
+                "-o",
+                "enclave.so",
+                "-B/usr/local/bin",
+                "-Wl,-z,relro,-z,now,-z,noexecstack",
+                "-Wl,--no-undefined",
+                "-nostdlib",
+                "-nodefaultlibs",
+                "-nostartfiles",
+                "-L/opt/intel/sgxsdk/lib64",
+                "-L/home/leone/文档/linux-sgx/SGXSan/output",
+                "-Wl,--whole-archive",
+                "-lSGXSanRTEnclave",
+                "-lsgx_trts",
+                "-Wl,--no-whole-archive",
+                "-Wl,--start-group",
+                "-lsgx_tstdc",
+                "-lsgx_tcxx",
+                "-lsgx_pthread",
+                "-lsgx_tcrypto",
+                "-lsgx_tservice",
+                "-Wl,--end-group",
+                "-Wl,-Bstatic",
+                "-Wl,-Bsymbolic",
+                "-Wl,--no-undefined",
+                "-Wl,-pie,-eenclave_entry",
+                "-Wl,--export-dynamic",
+                "-Wl,--defsym,__ImageBase=0",
+                "-Wl,--gc-sections",
+                "-Wl,--version-script=Enclave/Enclave.lds"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/SampleSGXSan",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-gdb-set follow-fork-mode child"
+                }
+            ]
+        },
+        {
+            "name": "(SampleSGXSan clang++) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/llvm/bin/clang++",
+            "args": [
+                "-Xclang",
+                "-load",
+                "-Xclang",
+                "/home/leone/文档/linux-sgx/SGXSan/output/libSGXSanPass.so",
+                "-m64",
+                "-O0",
+                "-g",
+                "-Wall",
+                "-Wextra",
+                "-Winit-self",
+                "-Wpointer-arith",
+                "-Wreturn-type",
+                "-Waddress",
+                "-Wsequence-point",
+                "-Wformat-security",
+                "-Wmissing-include-dirs",
+                "-Wfloat-equal",
+                "-Wundef",
+                "-Wshadow",
+                "-Wcast-align",
+                "-Wcast-qual",
+                "-Wconversion",
+                "-Wredundant-decls",
+                "-Wnon-virtual-dtor",
+                "-std=c++11",
+                "-IInclude",
+                "-IEnclave",
+                "-I/opt/intel/sgxsdk/include",
+                "-I/opt/intel/sgxsdk/include/tlibc",
+                "-I/opt/intel/sgxsdk/include/libcxx",
+                "-nostdinc",
+                "-fvisibility=hidden",
+                "-fpie",
+                "-ffunction-sections",
+                "-fdata-sections",
+                "-B/usr/local/bin",
+                "",
+                "-S",
+                "-emit-llvm",
+                "-fstack-protector",
+                "-nostdinc++",
+                "-Wno-implicit-exception-spec-mismatch",
+                "-c",
+                "Enclave/Edger8rSyntax/EdgeCheckPtr.cpp",
+                "-o",
+                "Enclave/Edger8rSyntax/EdgeCheckPtr.o"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/SampleSGXSan",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-gdb-set follow-fork-mode child"
+                }
+            ]
+        },
+        {
+            "name": "(SampleSGXSan opt) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/llvm/bin/opt",
+            "args": [
+                "-load",
+                "/home/leone/文档/linux-sgx/SGXSan/output/libSensitiveLeakSanPass.so",
+                "-SensitiveLeakSanPass",
+                "-S",
+                "SLSTest.o",
+                "-o",
+                "SLSTest.1.ll"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/SampleSGXSan/Enclave/Edger8rSyntax",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-gdb-set follow-fork-mode child"
+                }
+            ]
+        },
+        {
+            "name": "(SampleSGXSan) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/leone/文档/linux-sgx/SampleCode/SampleSGXSan/app",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/SampleSGXSan/",
+            "environment": [],
+            "externalConsole": false,
+            // "MIMode": "gdb",
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(SwitchlessSGXSan) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/leone/文档/linux-sgx/SampleCode/SwitchlessSGXSan/app",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/SwitchlessSGXSan/",
+            "environment": [],
+            "externalConsole": false,
+            // "MIMode": "gdb",
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(sgx-wallet) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/leone/文档/linux-sgx/SampleCode/sgx-wallet/sgx-wallet",
+            "args": [
+                "-t"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/leone/文档/linux-sgx/SampleCode/sgx-wallet/",
+            "environment": [],
+            "externalConsole": false,
+            // "MIMode": "gdb",
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

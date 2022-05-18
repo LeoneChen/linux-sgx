@@ -50,7 +50,7 @@ tips:
 preparation:
 # As SDK build needs to clone and patch openmp, we cannot support the mode that download the source from github as zip.
 # Only enable the download from git
-	git submodule update --init --recursive
+	git submodule update --init --recursive --depth=1
 	./external/dcap_source/QuoteVerification/prepare_sgxssl.sh nobuild
 	cd external/openmp/openmp_code && git apply ../0001-Enable-OpenMP-in-SGX.patch >/dev/null 2>&1 ||  git apply ../0001-Enable-OpenMP-in-SGX.patch --check -R
 	cd external/protobuf/protobuf_code && git apply ../sgx_protobuf.patch >/dev/null 2>&1 ||  git apply ../sgx_protobuf.patch --check -R

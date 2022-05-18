@@ -17,3 +17,15 @@
 	path = external/protobuf/protobuf_code
 	url = https://github.com/protocolbuffers/protobuf.git
 	branch = 3.14.x
+[submodule "SGXSan"]
+	path = SGXSan
+	url = git@github.com:LeoneChen/SGXSan.git
+[submodule "SampleCode/SampleSGXSan"]
+	path = SampleCode/SampleSGXSan
+	url = git@github.com:LeoneChen/SampleSGXSan.git
+[submodule "SampleCode/SwitchlessSGXSan"]
+	path = SampleCode/SwitchlessSGXSan
+	url = git@github.com:LeoneChen/SwitchlessSGXSan.git
+[submodule "SampleCode/sgx-wallet"]
+	path = SampleCode/sgx-wallet
+	url = git@github.com:LeoneChen/sgx-wallet.git
