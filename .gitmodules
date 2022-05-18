@@ -13,3 +13,6 @@
 	path = external/ippcp_internal/ipp-crypto
 	url = https://github.com/intel/ipp-crypto.git
 	branch = ipp-crypto_2020_update3
+[submodule "SGXSan"]
+	path = SGXSan
+	url = git@github.com:LeoneChen/SGXSan.git
