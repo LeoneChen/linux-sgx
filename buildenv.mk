@@ -65,7 +65,8 @@ OBJCOPY := objcopy
 NIPX := .nipx
 NIPD := .nipd
 NIPRODT := .niprod
-CC ?= gcc
+override CC = clang
+override CXX = clang++
 
 # clean the content of 'INCLUDE' - this variable will be set by vcvars32.bat
 # thus it will cause build error when this variable is used by our Makefile,
@@ -81,6 +82,7 @@ CC_VERSION_MINOR := $(shell echo $(CC_VERSION) | cut -f2 -d.)
 CC_BELOW_4_9 := $(shell [ $(CC_VERSION_MAJOR) -lt 4 -o \( $(CC_VERSION_MAJOR) -eq 4 -a $(CC_VERSION_MINOR) -le 9 \) ] && echo 1)
 CC_BELOW_5_2 := $(shell [ $(CC_VERSION_MAJOR) -lt 5 -o \( $(CC_VERSION_MAJOR) -eq 5 -a $(CC_VERSION_MINOR) -le 2 \) ] && echo 1)
 
+override COMMON_FLAGS += -Wno-implicit-exception-spec-mismatch -Wno-unknown-warning-option
 # turn on stack protector for SDK
 ifeq ($(CC_BELOW_4_9), 1)
     COMMON_FLAGS += -fstack-protector
@@ -195,6 +197,11 @@ else ifeq ($(MITIGATION-CVE-2020-0551), CF)
     MITIGATION_AFTERLOAD := 0
     MITIGATION_LIB_PATH := cve_2020_0551_cf
 endif
+MITIGATION_C := 0
+MITIGATION_ASM := 0
+MITIGATION_INDIRECT := 0
+MITIGATION_RET := 0
+MITIGATION_AFTERLOAD := 0
 
 ifneq ($(origin NIX_PATH), environment)
 BINUTILS_DIR ?= /usr/local/bin

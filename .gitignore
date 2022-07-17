@@ -29,3 +29,18 @@ redist.txt
 # directory created when running reproducibility scripts
 linux/reproducibility/code_dir/
 
+sdk/cpprt/linux/libunwind
+sdk/edger8r/linux/_build/
+psw/ae/aesm_service/source/build/
+psw/ae/aesm_service/data/
+linux/installer
+external
+*.pc
+*.rej
+*.json
+*.log
+sgx_encrypt
+sgx_sign
+sgx_config_cpusvn
+psw/ae/aesm_service/source/core/ipc/messages.pb.cc
+psw/ae/aesm_service/source/core/ipc/messages.pb.h
