@@ -1,0 +1,392 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(opt) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/ssd/chenliheng/Documents/llvm-project/install/bin/opt",
+            "args": [
+                "-enable-new-pm=0",
+                "-load",
+                "/mnt/ssd/chenliheng/Documents/linux-sgx/SGXSan/install/lib64/libFuncRenamePass.so",
+                "-FuncRenamePass",
+                "Enclave/Enclave_t.o",
+                "-o",
+                "Enclave/Enclave_t.o.1",
+                "-rename-func=ocall_getenv=__hidden_ocall_getenv,a=b"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/SGX_APP/SGX_SQLite",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Edger8r",
+            "type": "ocamlearlybird",
+            "request": "launch",
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "program": "/home/chenliheng/Documents/linux-sgx/SGXSan/edger8r/linux/_build/Edger8r.byte",
+            "yieldSteps": 1024,
+            "cwd": "/home/chenliheng/Documents/linux-sgx/SampleCode/SampleSGXSan/Enclave",
+            "arguments": [
+                "--trusted",
+                "../Enclave/Enclave.edl",
+                "--search-path",
+                "../Enclave",
+                "--search-path",
+                "/home/chenliheng/Documents/linux-sgx/SGXSan/install/include",
+                "--include-path",
+                "../Include"
+            ]
+        },
+        {
+            "name": "(QuoteGenerationSample) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/chenliheng/Documents/linux-sgx/external/dcap_source/SampleCode/QuoteGenerationSample/app",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "/home/chenliheng/Documents/linux-sgx/external/dcap_source/SampleCode/QuoteGenerationSample",
+            "environment": [],
+            "externalConsole": false,
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(libSGXFuzzerPass) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/ssd/chenliheng/Documents/llvm-project/install/bin/clang",
+            "args": [
+                "-m64",
+                "-O2",
+                "-g",
+                "-fPIC",
+                "-Wno-attributes",
+                "-Iapp",
+                "-I/mnt/ssd/chenliheng/Documents/linux-sgx/SGXSan/install/include",
+                "-Iinclude",
+                "-Itest",
+                "-flegacy-pass-manager",
+                "-Xclang",
+                "-load",
+                "-Xclang",
+                "/mnt/ssd/chenliheng/Documents/linux-sgx/SGXSan/install/lib64/libSGXFuzzerPass.so",
+                "-mllvm",
+                "--enable-enclave-tester-generator=true",
+                "-mllvm",
+                "-edl-json=enclave/enclave.edl.json",
+                "-fsanitize-coverage=inline-8bit-counters",
+                "-DNDEBUG",
+                "-DEDEBUG",
+                "-UDEBUG",
+                "-c",
+                "app/enclave_u.c",
+                "-o",
+                "app/enclave_u.o",
+            ],
+            "stopAtEntry": false,
+            "cwd": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/sgx-wallet",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-gdb-set follow-fork-mode child"
+                }
+            ]
+        },
+        {
+            "name": "(SGXSan) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/ssd/chenliheng/Documents/llvm-project/install/bin/clang++",
+            "args": [
+                "Enclave/Enclave_t.o",
+                "Enclave/Edger8rSyntax/Arrays.o",
+                "Enclave/Edger8rSyntax/Functions.o",
+                "Enclave/Edger8rSyntax/Pointers.o",
+                "Enclave/Edger8rSyntax/SGXSanTest.o",
+                "Enclave/Edger8rSyntax/Types.o",
+                "Enclave/Enclave.o",
+                "Enclave/TrustedLibrary/Libc.o",
+                "Enclave/TrustedLibrary/Libcxx.o",
+                "Enclave/TrustedLibrary/Thread.o",
+                "-o",
+                "enclave.so",
+                "-B/usr/local/bin",
+                "-Wl,-z,relro,-z,now,-z,noexecstack",
+                "-Wl,--no-undefined",
+                "-nostdlib",
+                "-nodefaultlibs",
+                "-nostartfiles",
+                "-L/mnt/ssd/chenliheng/Documents/linux-sgx/SGXSan/install/lib64",
+                "-L/opt/intel/sgxsdk/lib64",
+                "-Wl,--whole-archive",
+                "-lSGXSanRTEnclave",
+                "-lsgx_trts",
+                "-Wl,--no-whole-archive",
+                "-Wl,--start-group",
+                "-lsgx_tstdc",
+                "-lsgx_tcxx",
+                "-lsgx_pthread",
+                "-lsgx_tcrypto",
+                "-lsgx_tservice",
+                "-Wl,--end-group",
+                "-Wl,-Bstatic",
+                "-Wl,-Bsymbolic",
+                "-Wl,--no-undefined",
+                "-Wl,-pie,-eenclave_entry",
+                "-Wl,--export-dynamic",
+                "-Wl,--defsym,__ImageBase=0",
+                "-Wl,--gc-sections",
+                "-Wl,--version-script=Enclave/Enclave.lds",
+                "-fuse-ld=lld",
+                "-Wl,-save-temps",
+                "-Wl,--lto-legacy-pass-manager",
+                "-Wl,-mllvm=-load=/mnt/ssd/chenliheng/Documents/linux-sgx/SGXSan/install/lib64/libSGXSanPass.so",
+                "-Wl,-mllvm=-enable-sensitive-leak-san=true",
+                "-Wl,-mllvm=--stat=false"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/SampleSGXSan",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-gdb-set follow-fork-mode child"
+                }
+            ]
+        },
+        {
+            "name": "(SampleSGXSan) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/SampleSGXSan/app",
+            "args": [
+                // "-fork=1",
+                // "-ignore_crashes=1",
+                "./seeds",
+                "-artifact_prefix=./crashes/",
+                // "./crashes/crash-3cd326fc2968c90568b6d58d908e19651a0b7301",
+                "-verbosity=1",
+                "--cb_max_count=8",
+                "-max_len=1000000",
+                "--cb_filter_out=ecall_producer,ecall_consumer",
+                "--cb_log_level=3",
+                "--cb_provide_nullptr=false",
+                "--enclave_file_name=enclave.so",
+                // "-max_total_time=2",
+            ],
+            "stopAtEntry": false,
+            "cwd": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/SampleSGXSan",
+            "environment": [
+                {
+                    "name": "ASAN_OPTIONS",
+                    "value": "detect_leaks=0"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            // "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(SwitchlessSGXSan) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/chenliheng/Documents/linux-sgx/SampleCode/SwitchlessSGXSan/app",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/home/chenliheng/Documents/linux-sgx/SampleCode/SwitchlessSGXSan/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(sgx-wallet) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/sgx-wallet/sgx-wallet",
+            "args": [
+                "./seeds",
+                "-artifact_prefix=./crashes/",
+                // "./crashes/crash-97e8a64e6a8f5029917c9c84bc012ea5b8cd5f9f",
+                "-verbosity=2",
+                "--cb_max_count=8",
+                "-max_len=1000000",
+                "--cb_log_level=3",
+                "--cb_provide_nullptr=true",
+                "--cb_provide_nullptr_probability=0.5",
+                // "-fork=1",
+                // "-ignore_crashes=1",
+            ],
+            "stopAtEntry": false,
+            "cwd": "/mnt/ssd/chenliheng/Documents/linux-sgx/SGX_APP/sgx-wallet/",
+            "environment": [
+                {
+                    "name": "ASAN_OPTIONS",
+                    "value": "detect_leaks=0"
+                }
+            ],
+            "externalConsole": false,
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "-interpreter-exec console \"set print elements 0\"",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(sgx-reencrypt) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SGX_APP/sgx-reencrypt/bin/test-app",
+            "args": [
+                "./seeds",
+                "-artifact_prefix=./crashes/",
+                // "./crashes/crash-da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "-verbosity=2",
+                "--cb_max_count=8",
+                "-max_len=1000000",
+                "--cb_log_level=4",
+                "--cb_provide_nullptr=true",
+                "--cb_provide_nullptr_probability=0",
+                // "-fork=1",
+                // "-ignore_crashes=1",
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/SGX_APP/sgx-reencrypt",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(SGX_SQLite) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/SGX_APP/SGX_SQLite/app",
+            "args": [
+                // "./seeds",
+                // "-artifact_prefix=./crashes/",
+                "./crashes/crash-640324381ffbc94d6f6e4848d4dfb8b3437f0fd8",
+                "-verbosity=2",
+                "--cb_max_count=8",
+                "-max_len=1000000",
+                "--cb_log_level=4",
+                "--cb_provide_nullptr=true",
+                "--cb_provide_nullptr_probability=0",
+                // "-fork=1",
+                // "-ignore_crashes=1",
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/SGX_APP/SGX_SQLite/",
+            "environment": [],
+            "externalConsole": false,
+            "miDebuggerPath": "/opt/intel/sgxsdk/bin/sgx-gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    ]
+}
