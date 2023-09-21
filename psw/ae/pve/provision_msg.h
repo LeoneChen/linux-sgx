@@ -43,6 +43,7 @@
 #include "epid_pve_type.h"
 #include "sgx_tseal.h"
 #include "sgx_report.h"
+#include "sgx_memset_s.h"
 
 /*error code definition*/
 typedef enum _pve_status_t

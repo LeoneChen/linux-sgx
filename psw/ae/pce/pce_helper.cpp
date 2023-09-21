@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include "sgx_memset_s.h"
 
 
 //Function to get provisioning key using the provided PSVN

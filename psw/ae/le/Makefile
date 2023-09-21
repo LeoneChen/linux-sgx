@@ -34,8 +34,8 @@ include ../buildenv.mk
 
 AENAME = launch_enclave
 
-CFLAGS   += -Werror
-CXXFLAGS += -Werror
+# CFLAGS   += -Werror
+# CXXFLAGS += -Werror
 
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/common
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/data/constants/linux 
@@ -47,17 +47,40 @@ OBJS := $(sort $(OBJ) version.o)
 AENAME_OUT :=  $(SONAME) #generate $(SONAME) only but do not sign it
 
 CONFIG := config_linux.xml
+APP_NAME := FuzzLE
+App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(INCLUDE) $(DEFINES) \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIB_DIR) $(URTSLIB) $(UAE_SERVICE_LIB) -lpthread \
+	-ldl \
+	-Wl,-rpath=$(SGX_LIB_DIR) \
+	-Wl,-whole-archive -lSGXSanRTApp -Wl,-no-whole-archive \
+	-lSGXFuzzerRT \
+	-lcrypto \
+	-lboost_program_options \
+	-rdynamic \
+	-fuse-ld=${LD} \
+	-fprofile-instr-generate
+Enclave_Cpp_Flags := \
+	-fno-discard-value-names \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXSanPass.so \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+Enclave_Link_Flags := -fuse-ld=${LD} -fprofile-instr-generate -shared
 
 .PHONY: all
-all: $(AENAME_OUT) 
+all: $(AENAME_OUT) $(APP_NAME)
 
 $(SONAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@  $(OBJS) -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+	$(CXX) $(CXXFLAGS) -o $@  $(OBJS) $(LDTFLAGS) $(Enclave_Link_Flags)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
 
 $(OBJ):$(AENAME)_t.c  
 $(OBJ): %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(Enclave_Cpp_Flags) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
 
 $(AENAME)_t.c: $(EDLFILE)
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)
@@ -65,12 +88,25 @@ $(AENAME)_t.c: $(EDLFILE)
 $(BUILD_DIR):
 	@$(MKDIR) $@
 
+# Generate FuzzLE
+$(AENAME)_u.c: $(EDLFILE)
+	@$(EDGER8R) --untrusted $< --search-path $(SGX_HEADER_DIR) --dump-parse ./Enclave.edl.json
+
+$(AENAME)_u.o: $(AENAME)_u.c
+	$(CC) $(App_C_Flags) -c $< -o $@ \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXFuzzerPass.so
+
+$(APP_NAME): $(AENAME)_u.o
+	$(CXX) $(App_Link_Flags) $^ -o $@
+
 .PHONY: clean
 clean:
 	@$(RM) *.o
 	@$(RM) *.so
 	@$(RM) *.map
 	@$(RM) *_t.*
+	@$(RM) *_u.* $(APP_NAME)
 
 .PHONY: rebuild
 rebuild: 

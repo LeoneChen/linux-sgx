@@ -36,6 +36,7 @@
 #include "helper.h"
 #include "cipher.h"
 #include <string.h>
+#include "sgx_memset_s.h"
 
 //Function to generate 1 byte selector id for end point selection
 //The End Point Selection is an optional protocol before SGX EPID Provisioning

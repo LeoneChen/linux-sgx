@@ -30,11 +30,10 @@
 #
 
 TOP_DIR := ../../..
-MITIGATION-CVE-2020-0551=LOAD
 include ../buildenv.mk
 
-CXXFLAGS  += -Werror
-CFLAGS    += -Werror 
+# CXXFLAGS  += -Werror
+# CFLAGS    += -Werror 
 
 AENAME = pce
 
@@ -50,22 +49,46 @@ SRC := $(wildcard *.cpp)
 OBJ := $(SRC:.cpp=.o)
 OBJS := $(sort $(OBJ) version.o)
 
+APP_NAME := FuzzPCE
+App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(INCLUDE) $(DEFINES) \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIB_DIR) $(URTSLIB) $(UAE_SERVICE_LIB) -lpthread \
+	-ldl \
+	-Wl,-rpath=$(SGX_LIB_DIR) \
+	-Wl,-whole-archive -lSGXSanRTApp -Wl,-no-whole-archive \
+	-lSGXFuzzerRT \
+	-lcrypto \
+	-lboost_program_options \
+	-rdynamic \
+	-fuse-ld=${LD} \
+	-fprofile-instr-generate
+Enclave_Cpp_Flags := \
+	-fno-discard-value-names \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXSanPass.so \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+Enclave_Link_Flags := -fuse-ld=${LD} -fprofile-instr-generate -shared
+
 .PHONY: all
-all: $(SONAME)
+all: $(SONAME) $(APP_NAME)
 
 ifneq ($(SGX_MODE), HW)
-all: pce_sim_private_key.pem
-	$(SGXSIGN) sign -key pce_sim_private_key.pem -enclave $(SONAME) -out libsgx_$(AENAME).signed.so -config $(CONFIG)
+#all: pce_sim_private_key.pem
+#	$(SGXSIGN) sign -key pce_sim_private_key.pem -enclave $(SONAME) -out libsgx_$(AENAME).signed.so -config $(CONFIG)
 endif
 
 $(SONAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@  $(OBJS)  -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+	$(CXX) $(CXXFLAGS) -o $@  $(OBJS) $(LDTFLAGS) $(Enclave_Link_Flags)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
 
 pce.o: $(AENAME)_t.c
 
 %.o:%.cpp 
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(DEFINES) -fno-exceptions -fno-rtti -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(Enclave_Cpp_Flags) $(INCLUDE) $(DEFINES) -fno-exceptions -fno-rtti -c $< -o $@
 
 $(AENAME)_t.c: $(AENAME).edl
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)
@@ -73,12 +96,25 @@ $(AENAME)_t.c: $(AENAME).edl
 $(BUILD_DIR):
 	@$(MKDIR) $@
 
+# Generate FuzzPCE
+$(AENAME)_u.c: $(AENAME).edl
+	@$(EDGER8R) --untrusted $< --search-path $(SGX_HEADER_DIR) --dump-parse ./Enclave.edl.json
+
+$(AENAME)_u.o: $(AENAME)_u.c
+	$(CC) $(App_C_Flags) -c $< -o $@ \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXFuzzerPass.so
+
+$(APP_NAME): $(AENAME)_u.o
+	$(CXX) $(App_Link_Flags) $^ -o $@
+
 .PHONY: clean
 clean:
 	@$(RM) *.o
 	@$(RM) *.so
 	@$(RM) *.map
 	@$(RM) *_t.* 
+	@$(RM) *_u.* $(APP_NAME)
 
 .PHONY: rebuild
 rebuild:

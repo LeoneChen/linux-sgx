@@ -1,3 +1,11 @@
+#if defined(__cplusplus)
+extern "C"{
+#endif
+void SGXSanLogEnter(const char *str);
+#if defined(__cplusplus)
+}
+#endif
+#define LogEnter SGXSanLogEnter
 /*
  * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
@@ -329,6 +337,7 @@ int le_get_launch_token_wrapper(
     const sgx_attributes_t* se_attributes,
     token_t* lictoken)
 {
+    LogEnter(__func__);
     // Security assumption is that the edgr8r generated trusted bridge code
     // makes sure mrenclave, mrsigner, se_attributes, lictoken buffers are all
     // inside enclave. check all input and output pointers, defense in depth
@@ -572,6 +581,7 @@ uint32_t le_init_white_list_wrapper(
     const uint8_t *wl_cert_chain,
     uint32_t wl_cert_chain_size)
 {
+    LogEnter(__func__);
     const wl_cert_chain_t *p_wl_cert_chain = NULL;
     uint32_t entry_number = 0;
     uint32_t temp_size = 0;

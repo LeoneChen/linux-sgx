@@ -54,13 +54,16 @@ EPID_SDK_DIR := $(LINUX_EXTERNAL_DIR)/epid-sdk
 ifneq ($(SGX_MODE), HW)
 	URTSLIB := -lsgx_urts_sim
 	TRTSLIB := -lsgx_trts_sim
+    UAE_SERVICE_LIB := -lsgx_uae_service_sim
+    EXTERNAL_LIB := -lsgx_tservice_sim
 else
 	URTSLIB := -lsgx_urts
 	TRTSLIB := -lsgx_trts
+    UAE_SERVICE_LIB := -lsgx_uae_service
+    EXTERNAL_LIB := -lsgx_tservice
 endif
-EXTERNAL_LIB := -lsgx_tservice
 
-EXTERNAL_LIB += -lsgx_tstdc -lsgx_tcrypto -lsgx_tcxx
+EXTERNAL_LIB += -lsgx_tcrypto
 
 INCLUDE := -I$(LINUX_PSW_DIR)/ae/inc                   \
            -I$(SGX_HEADER_DIR)                         \
@@ -74,11 +77,11 @@ EDGER8R   := $(SGX_BIN_DIR)/sgx_edger8r
 CXXFLAGS  += $(ENCLAVE_CXXFLAGS)
 CFLAGS    += $(ENCLAVE_CFLAGS)
 
-LDTFLAGS  = -L$(SGX_LIB_DIR) -Wl,--whole-archive $(TRTSLIB) -Wl,--no-whole-archive \
+LDTFLAGS  = -L$(SGX_LIB_DIR) -Wl,--whole-archive -lSGXSanRTEnclave $(TRTSLIB) -Wl,--no-whole-archive \
             -Wl,--start-group $(EXTERNAL_LIB) -Wl,--end-group -Wl,--build-id       \
-            -Wl,--version-script=$(ROOT_DIR)/build-scripts/enclave.lds $(ENCLAVE_LDFLAGS)
+            $(ENCLAVE_LDFLAGS)
 
-LDTFLAGS += -fuse-ld=gold -Wl,--rosegment -Wl,-Map=out.map -Wl,--undefined=version -Wl,--gc-sections
+LDTFLAGS += -fuse-ld=$(LD) -Wl,--rosegment -Wl,-Map=out.map -Wl,--undefined=version -Wl,--gc-sections
 
 DEFINES := -D__linux__
 

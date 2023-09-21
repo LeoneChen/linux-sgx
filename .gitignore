@@ -29,3 +29,9 @@ redist.txt
 # directory created when running reproducibility scripts
 linux/reproducibility/code_dir/
 
+FuzzLE
+FuzzPCE
+FuzzPVE
+FuzzQE
+Enclave.edl.json
+out.map

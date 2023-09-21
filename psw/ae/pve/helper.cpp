@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include "byte_order.h"
 #include "util.h"
+#include "sgx_memset_s.h"
 
 
 //Function to get provisioning key using the provided PSVN

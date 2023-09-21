@@ -30,11 +30,11 @@
 #
 
 TOP_DIR := ../../..
-MITIGATION-CVE-2020-0551=LOAD
 include ../buildenv.mk
 
-CXXFLAGS  += -Werror
-CFLAGS	+= -Werror
+# CXXFLAGS  += -Werror
+# CFLAGS	+= -Werror
+AENAME = quoting_enclave
 
 EXTERNAL_LIB += -L$(EPID_SDK_DIR)/epid/member -lmember \
 				-L$(EPID_SDK_DIR)/epid/common -lcommon
@@ -53,28 +53,68 @@ SRC += se_sig_rl.cpp                  \
 OBJ := $(SRC:.cpp=.o)
 OBJS := $(sort $(OBJ) version.o)
 
-EPID_FILTER = -Werror -nostdinc -nostdinc++
-EPID_CFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CFLAGS))
-EPID_CXXFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CXXFLAGS))
+EPID_CFLAGS = \
+	-fvisibility=hidden -fpie -fno-strict-overflow -fno-delete-null-pointer-checks \
+	-fno-discard-value-names \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp
+EPID_CXXFLAGS = \
+	-fvisibility=hidden -fpie -fno-strict-overflow -fno-delete-null-pointer-checks \
+	-fno-discard-value-names \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp
+APP_NAME := FuzzQE
+App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(INCLUDE) $(DEFINES) \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIB_DIR) $(URTSLIB) $(UAE_SERVICE_LIB) -lpthread \
+	-ldl \
+	-Wl,-rpath=$(SGX_LIB_DIR) \
+	-Wl,-whole-archive -lSGXSanRTApp -Wl,-no-whole-archive \
+	-lSGXFuzzerRT \
+	-lcrypto \
+	-lboost_program_options \
+	-rdynamic \
+	-fuse-ld=${LD} \
+	-fprofile-instr-generate
+Enclave_Cpp_Flags := \
+	-fno-discard-value-names \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXSanPass.so \
+	-fsanitize-coverage=inline-8bit-counters,bb,no-prune,pc-table,trace-cmp \
+	-fprofile-instr-generate \
+	-fcoverage-mapping
+Enclave_Link_Flags := -fuse-ld=${LD} -fprofile-instr-generate -shared
 
 .PHONY: all
-all: $(SONAME) 
+all: $(SONAME) $(APP_NAME)
 
 .PHONY: EPID
 EPID:
-	cd $(EPID_SDK_DIR) && CFLAGS="$(EPID_CFLAGS)" CXXFLAGS="$(EPID_CXXFLAGS)" ./configure prefix=/usr/local
+	cd $(EPID_SDK_DIR) && CC="$(CC)" CXX="$(CXX)" CFLAGS="$(EPID_CFLAGS)" CXXFLAGS="$(EPID_CXXFLAGS)" ./configure prefix=/usr/local
 	$(MAKE) -C $(EPID_SDK_DIR) 2> /dev/null
 
 $(SONAME): $(OBJS) EPID
-	$(CC) $(CFLAGS) -o $@ $(OBJS) -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDTFLAGS) $(Enclave_Link_Flags)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
 
 $(OBJ): $(AENAME)_t.c
 $(OBJ): %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(Enclave_Cpp_Flags) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
 
 $(AENAME)_t.c: $(EDLFILE)
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)
+
+# Generate FuzzerQE
+$(AENAME)_u.c: $(EDLFILE)
+	@$(EDGER8R) --untrusted $< --search-path $(SGX_HEADER_DIR) --dump-parse ./Enclave.edl.json
+
+$(AENAME)_u.o: $(AENAME)_u.c
+	$(CXX) $(App_C_Flags) -c $< -o $@ \
+	-flegacy-pass-manager \
+	-Xclang -load -Xclang $(SGX_SDK)/lib64/libSGXFuzzerPass.so
+
+$(APP_NAME): $(AENAME)_u.o
+	$(CXX) $^ -o $@ $(App_Link_Flags)
 
 .PHONY: clean
 clean:
@@ -82,6 +122,7 @@ clean:
 	@$(RM) *.so
 	@$(RM) *.map
 	@$(RM) *_t.*
+	@$(RM) *_u.* $(APP_NAME)
 ifeq ("$(shell test -f $(EPID_SDK_DIR)/Makefile && echo Makefile exists)", "Makefile exists")
 	-$(MAKE) -C $(EPID_SDK_DIR) clean
 endif
