@@ -1,3 +1,4 @@
+#include "kafl_hc.h"
 /*
  * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
@@ -36,7 +37,9 @@
 #include "byte_order.h"
 #include "sgx_utils.h"
 
-#include "launch_enclave_t.c"
+#include "launch_enclave_t.h"
+#include "sgx_trts.h"
+#include <string.h>
 #include "wl_pub.hh"
 #include "launch_enclave_mrsigner.hh"
 #include "service_enclave_mrsigner.hh"
@@ -329,6 +332,7 @@ int le_get_launch_token_wrapper(
     const sgx_attributes_t* se_attributes,
     token_t* lictoken)
 {
+    LogEnter(__func__);
     // Security assumption is that the edgr8r generated trusted bridge code
     // makes sure mrenclave, mrsigner, se_attributes, lictoken buffers are all
     // inside enclave. check all input and output pointers, defense in depth
@@ -572,6 +576,7 @@ uint32_t le_init_white_list_wrapper(
     const uint8_t *wl_cert_chain,
     uint32_t wl_cert_chain_size)
 {
+    LogEnter(__func__);
     const wl_cert_chain_t *p_wl_cert_chain = NULL;
     uint32_t entry_number = 0;
     uint32_t temp_size = 0;

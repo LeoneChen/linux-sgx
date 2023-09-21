@@ -51,21 +51,27 @@ OBJ := $(SRC:.cpp=.o)
 OBJS := $(sort $(OBJ) version.o)
 
 .PHONY: all
-all: $(SONAME)
+all: $(AENAME).signed.so
 
 ifneq ($(SGX_MODE), HW)
 all: pce_sim_private_key.pem
 	$(SGXSIGN) sign -key pce_sim_private_key.pem -enclave $(SONAME) -out libsgx_$(AENAME).signed.so -config $(CONFIG)
 endif
 
-$(SONAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@  $(OBJS)  -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+$(SONAME): $(OBJS) $(AENAME)_t.o
+	$(CXX) $(CXXFLAGS) -o $@  $(OBJS) $(AENAME)_t.o -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+
+$(AENAME).signed.so: $(SONAME)
+	$(SGXSIGN) sign -key ../../../AE_private_test.pem -enclave $< -out $@ -config config.xml
 
 pce.o: $(AENAME)_t.c
 
 %.o:%.cpp 
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(DEFINES) -fno-exceptions -fno-rtti -c $< -o $@
+
+$(AENAME)_t.o: $(AENAME)_t.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $< -o $@
 
 $(AENAME)_t.c: $(AENAME).edl
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)

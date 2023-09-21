@@ -1,3 +1,4 @@
+#include "kafl_hc.h"
 /*
  * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
@@ -32,7 +33,8 @@
 #include <sgx_secure_align.h>
 #include <sgx_random_buffers.h>
 #include "pce_cert.h"
-#include "pce_t.c"
+#include "pce_t.h"
+#include "sgx_trts.h"
 #include "aeerror.h"
 #include "sgx_utils.h"
 #include "sgx_lfence.h"
@@ -76,6 +78,7 @@ uint32_t get_pc_info(const sgx_report_t* report,
     pce_info_t *pce_info,
     uint8_t *signature_scheme)
 {
+    LogEnter(__func__);
     if (report == NULL ||
         public_key == NULL ||
         encrypted_ppid == NULL ||
@@ -235,6 +238,7 @@ uint32_t get_pc_info(const sgx_report_t* report,
 
 uint32_t get_pc_info_without_ppid(pce_info_t *pce_info)
 {
+    LogEnter(__func__);
     if (pce_info == NULL) {
         return AE_INVALID_PARAMETER;
     }
@@ -256,6 +260,7 @@ uint32_t certify_enclave(const psvn_t* cert_psvn,
                          uint32_t signature_buf_size,
                          uint32_t *signature_out_size)
 {
+    LogEnter(__func__);
     if(cert_psvn==NULL||
         report==NULL||
         signature == NULL||

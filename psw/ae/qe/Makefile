@@ -35,6 +35,7 @@ include ../buildenv.mk
 
 CXXFLAGS  += -Werror
 CFLAGS	+= -Werror
+AENAME = quoting_enclave
 
 EXTERNAL_LIB += -L$(EPID_SDK_DIR)/epid/member -lmember \
 				-L$(EPID_SDK_DIR)/epid/common -lcommon
@@ -58,20 +59,26 @@ EPID_CFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CFLAGS))
 EPID_CXXFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CXXFLAGS))
 
 .PHONY: all
-all: $(SONAME) 
+all: $(AENAME).signed.so
 
 .PHONY: EPID
 EPID:
 	cd $(EPID_SDK_DIR) && CFLAGS="$(EPID_CFLAGS)" CXXFLAGS="$(EPID_CXXFLAGS)" ./configure prefix=/usr/local
 	$(MAKE) -C $(EPID_SDK_DIR) 2> /dev/null
 
-$(SONAME): $(OBJS) EPID
-	$(CC) $(CFLAGS) -o $@ $(OBJS) -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+$(SONAME): $(OBJS) EPID $(AENAME)_t.o
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(AENAME)_t.o -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+
+$(AENAME).signed.so: $(SONAME)
+	$(SGXSIGN) sign -key ../../../AE_private_test.pem -enclave $< -out $@ -config config.xml
 
 $(OBJ): $(AENAME)_t.c
 $(OBJ): %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
+
+$(AENAME)_t.o: $(AENAME)_t.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $< -o $@
 
 $(AENAME)_t.c: $(EDLFILE)
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)

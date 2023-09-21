@@ -1,3 +1,4 @@
+#include "kafl_hc.h"
 /*
  * Copyright (C) 2011-2021 Intel Corporation. All rights reserved.
  *
@@ -44,7 +45,8 @@
 #include "cipher.h"
 #include "protocol.h"
 #include "provision_msg.h"
-#include "provision_enclave_t.c"
+#include "provision_enclave_t.h"
+#include "sgx_trts.h"
 #include "sgx_utils.h"
 #include "sgx_lfence.h"
 #include "aeerror.h"
@@ -87,6 +89,7 @@ uint32_t gen_prov_msg1_data_wrapper(
     const sgx_target_info_t *pce_target_info,
     sgx_report_t *pek_report)//output data for generating ProvMsg1
 {
+    LogEnter(__func__);
     pve_status_t status = PVEC_SUCCESS;
 
     if(pce_target_info == NULL || !sgx_is_within_enclave(pce_target_info, sizeof(sgx_target_info_t))){
@@ -126,6 +129,7 @@ uint32_t proc_prov_msg2_data_wrapper(
     gen_prov_msg3_output_t *msg3_fixed_output,
     uint8_t *epid_sig, uint32_t epid_sig_buffer_size)//This is an optional pointer to external memory for epid signature to be generated
 {
+    LogEnter(__func__);
     pve_status_t status  = PVEC_SUCCESS;
     const external_memory_byte_t *emp_sigrl = NULL;
     external_memory_byte_t *emp_epid_sig = NULL;
@@ -183,6 +187,7 @@ uint32_t proc_prov_msg4_data_wrapper(
     const proc_prov_msg4_input_t *msg4_input,
     proc_prov_msg4_output_t* data_blob)
 {
+    LogEnter(__func__);
     pve_status_t status = PVEC_SUCCESS;
 
     if(msg4_input == NULL || !sgx_is_within_enclave(msg4_input, sizeof(proc_prov_msg4_input_t))){
@@ -205,6 +210,7 @@ ret_point:
 //proxy function to create es selector for endpoint selection
 uint32_t gen_es_msg1_data_wrapper(gen_endpoint_selection_output_t *es_output)
 {
+    LogEnter(__func__);
     pve_status_t status = PVEC_SUCCESS;
 
     if(es_output == NULL || !sgx_is_within_enclave(es_output, sizeof(gen_endpoint_selection_output_t))){

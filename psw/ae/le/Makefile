@@ -49,15 +49,21 @@ AENAME_OUT :=  $(SONAME) #generate $(SONAME) only but do not sign it
 CONFIG := config_linux.xml
 
 .PHONY: all
-all: $(AENAME_OUT) 
+all: $(AENAME).signed.so 
 
-$(SONAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@  $(OBJS) -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
-	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+$(SONAME): $(OBJS) $(AENAME)_t.o
+	$(CXX) $(CXXFLAGS) -o $@ $(AENAME)_t.o $(OBJS) -nostdlib -nodefaultlibs -nostartfiles $(LDTFLAGS)
+#	$(STRIP) --strip-unneeded --remove-section=.comment --remove-section=.note $(SONAME)
+
+$(AENAME).signed.so: $(SONAME)
+	$(SGXSIGN) sign -key ../../../AE_private_test.pem -enclave $< -out $@ -config $(CONFIG)
 
 $(OBJ):$(AENAME)_t.c  
 $(OBJ): %.o:%.cpp
 	$(CXX) $(CXXFLAGS) -fno-exceptions -fno-rtti $(INCLUDE) $(DEFINES) -c $< -o $@
+
+$(AENAME)_t.o: $(AENAME)_t.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -c $< -o $@
 
 $(AENAME)_t.c: $(EDLFILE)
 	@$(EDGER8R) --trusted $< --search-path $(SGX_HEADER_DIR)
