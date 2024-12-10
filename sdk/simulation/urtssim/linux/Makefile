@@ -151,7 +151,7 @@ $(LIBURTSSIM_STATIC): $(LIBURTSSIM_SHARED)
 	$(RM) -f se_event.o
 	$(AR) rsD $@ $(OBJ) $(OBJ6) $(BUILD_DIR)/.sgx_static_urts/*.o
 
-$(LIBURTSSIM_STATIC_WITH_EVENT): $(LIBURTSSIM_SHARED)
+$(LIBURTSSIM_STATIC_WITH_EVENT): $(LIBURTSSIM_SHARED) $(LIBURTSSIM_STATIC)
 	@$(MKDIR) $(BUILD_DIR)/.sgx_static_urts
 	@$(RM) -f $(BUILD_DIR)/.sgx_static_urts/*
 	cd $(BUILD_DIR)/.sgx_static_urts && \

@@ -1,5 +1,8 @@
 #object file
 *.o
+*.Plo
+*.dirstamp
+*.pc
 
 #library
 *.a
