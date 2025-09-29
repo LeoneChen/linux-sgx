@@ -33,3 +33,13 @@ redist.txt
 # directory created when running reproducibility scripts
 linux/reproducibility/code_dir/
 
+linux/installer/
+sdk/edger8r/linux/_build/
+sdk/cpprt/linux/libunwind/
+sdk/encrypt_enclave/sgx_encrypt
+sdk/sign_tool/SignTool/sgx_sign
+sdk/simulation/SEConfigureCPUSVN/linux/sgx_config_cpusvn
+common/inc
+external/rdrand/src/
+external/CppMicroServices/local-install/
+psw/ae/aesm_service/
