@@ -25,6 +25,8 @@
 #include <wchar.h>
 typedef wchar_t WCHAR;
 
+typedef int errno_t;
+
 #ifdef __cplusplus
     extern "C" {
 #endif
@@ -77,6 +79,8 @@ extern errno_t memcpy_s( void * dst, size_t sizeInBytes, const void * src, size_
 extern errno_t memcpy_verw_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
 extern errno_t memmove_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
 extern errno_t memmove_verw_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
+
+extern errno_t memset_s(void *s, size_t smax, int c, size_t n);
 
 #ifdef __cplusplus
     }

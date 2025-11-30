@@ -87,10 +87,13 @@ int sgx_thread_cond_wait(sgx_thread_cond_t *cond, sgx_thread_mutex_t *mutex)
         SPIN_UNLOCK(&cond->m_lock);
         /* OPT: if there is a thread waiting on the mutex, wake it in a single OCALL. */
         if (waiter == SGX_THREAD_T_NULL) {
-            sgx_thread_wait_untrusted_event_ocall(&ret, TD2TCS(self));
+            ret = sgx_thread_wait_untrusted_event_call(TD2TCS(self));
         } else {
-            sgx_thread_setwait_untrusted_events_ocall(&ret, TD2TCS(waiter), TD2TCS(self));
+            ret = sgx_thread_setwait_untrusted_events_call(TD2TCS(waiter), TD2TCS(self));
             waiter = SGX_THREAD_T_NULL;
+        }
+        if (ret != SGX_SUCCESS) {
+          abort();
         }
         SPIN_LOCK(&cond->m_lock);
 
@@ -122,7 +125,10 @@ int sgx_thread_cond_signal(sgx_thread_cond_t *cond)
     QUEUE_REMOVE_HEAD(&cond->m_queue);
     SPIN_UNLOCK(&cond->m_lock);
 
-    sgx_thread_set_untrusted_event_ocall(&err, TD2TCS(waiter));    /* wake first pending thread */
+    err = sgx_thread_set_untrusted_event_call(TD2TCS(waiter));    /* wake first pending thread */
+    if (err != SGX_SUCCESS) {
+      abort();
+    }
 
     return 0;
 }
@@ -156,7 +162,10 @@ int sgx_thread_cond_broadcast(sgx_thread_cond_t *cond)
 
     SPIN_UNLOCK(&cond->m_lock);
 
-    sgx_thread_set_multiple_untrusted_events_ocall(&err, waiters, n_waiter);   /* wake all pending threads up */
+    err = sgx_thread_set_multiple_untrusted_events_call(waiters, n_waiter);   /* wake all pending threads up */
+    if (err != SGX_SUCCESS) {
+      abort();
+    }
     free(waiters);
     return 0;
 }

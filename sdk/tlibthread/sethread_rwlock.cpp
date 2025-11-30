@@ -121,7 +121,10 @@ int sgx_thread_rwlock_rdlock(sgx_thread_rwlock_t *rwlock)
             SPIN_UNLOCK(&rwlock->m_lock);
 
             //make an OCall to wait for the lock
-            sgx_thread_wait_untrusted_event_ocall(&err, TD2TCS(self));
+            err = sgx_thread_wait_untrusted_event_call(TD2TCS(self));
+            if (err != SGX_SUCCESS) {
+              abort();
+            }
 
             SPIN_LOCK(&rwlock->m_lock);
 
@@ -212,7 +215,10 @@ int sgx_thread_rwlock_wrlock(sgx_thread_rwlock_t *rwlock)
             SPIN_UNLOCK(&rwlock->m_lock);
 
             //make an OCall to wait for the lock
-            sgx_thread_wait_untrusted_event_ocall(&err, TD2TCS(self));
+            err = sgx_thread_wait_untrusted_event_call(TD2TCS(self));
+            if (err != SGX_SUCCESS) {
+              abort();
+            }
             
             SPIN_LOCK(&rwlock->m_lock);
 
@@ -294,8 +300,12 @@ int sgx_thread_rwlock_rdunlock(sgx_thread_rwlock_t *rwlock)
 
         SPIN_UNLOCK(&rwlock->m_lock);
         
-        if (waiter != SGX_THREAD_T_NULL) /* wake the waiter up*/
-            sgx_thread_set_untrusted_event_ocall(&ret, TD2TCS(waiter));
+        if (waiter != SGX_THREAD_T_NULL) /* wake the waiter up*/{
+          ret = sgx_thread_set_untrusted_event_call(TD2TCS(waiter));
+          if (ret != SGX_SUCCESS) {
+            abort();
+          }
+        }
     }
     else
     {
@@ -346,7 +356,10 @@ int sgx_thread_rwlock_wrunlock(sgx_thread_rwlock_t *rwlock)
         SPIN_UNLOCK(&rwlock->m_lock);
         
         /* wake all the queued threads up*/
-        sgx_thread_set_multiple_untrusted_events_ocall(&ret, ppWaiters, iCount);
+        ret = sgx_thread_set_multiple_untrusted_events_call(ppWaiters, iCount);
+        if (ret != SGX_SUCCESS) {
+          abort();
+        }
         free(ppWaiters);
     }
     else
@@ -357,7 +370,10 @@ int sgx_thread_rwlock_wrunlock(sgx_thread_rwlock_t *rwlock)
         if (waiter != SGX_THREAD_T_NULL)
         {
             /* wake the waiter up*/
-            sgx_thread_set_untrusted_event_ocall(&ret, TD2TCS(waiter));
+            ret = sgx_thread_set_untrusted_event_call(TD2TCS(waiter));
+            if (ret != SGX_SUCCESS) {
+              abort();
+            }
         }
     }
 

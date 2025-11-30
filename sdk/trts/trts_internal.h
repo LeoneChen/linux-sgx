@@ -35,7 +35,8 @@
 #include "trts_shared_constants.h"
 #include "trts_internal_types.h"
 
-#define TD2TCS(td) ((const void *)(((thread_data_t*)(td))->stack_base_addr + (size_t)STATIC_STACK_SIZE + (size_t)SE_GUARD_PAGE_SIZE))
+#include "my_thread.h"
+// #define TD2TCS(td) ((const void *)(((thread_data_t*)(td))->stack_base_addr + (size_t)STATIC_STACK_SIZE + (size_t)SE_GUARD_PAGE_SIZE))
 #define TCS2CANARY(addr)    ((size_t *)((size_t)(addr)-(size_t)SE_GUARD_PAGE_SIZE-(size_t)STATIC_STACK_SIZE+sizeof(size_t)))
 
 #ifdef __cplusplus

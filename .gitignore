@@ -33,3 +33,21 @@ redist.txt
 # directory created when running reproducibility scripts
 linux/reproducibility/code_dir/
 
+BSD-3-Clause.txt
+common/inc/internal/bit_array.h
+common/inc/internal/bit_array_imp.h
+common/inc/internal/ema.h
+common/inc/internal/ema_imp.h
+common/inc/internal/emm_private.h
+common/inc/sgx_mm.h
+common/inc/sgx_mm_primitives.h
+common/inc/sgx_mm_rt_abstraction.h
+external/rdrand/src/Makefile
+external/rdrand/src/config.h
+external/rdrand/src/config.log
+external/rdrand/src/config.status
+external/rdrand/src/test
+psw/ae/aesm_service/source/core/ipc/messages.pb.cc
+psw/ae/aesm_service/source/core/ipc/messages.pb.h
+sdk/edger8r/linux/_build/
+sdk/sign_tool/SignTool/sgx_sign
