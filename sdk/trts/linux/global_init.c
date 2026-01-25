@@ -68,6 +68,7 @@ typedef void (*fp_t)(void);
 /* required by global constructor when -fuse-cxa-atexit is enabled */
 void *__dso_handle __attribute__((weak)) = &(__dso_handle);
 
+#if 0
 int __cxa_atexit(void (*fun)(void *), void *para, void *dso)
 {
     if(unlikely(g_exit_function_cookie == 0))
@@ -117,6 +118,7 @@ int atexit(void (*fun)(void))
 {
     return __cxa_atexit((void (*)(void *))fun, NULL, __dso_handle);
 }
+#endif
 
 static void do_atexit_aux(void)
 {

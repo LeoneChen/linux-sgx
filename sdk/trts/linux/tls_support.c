@@ -44,6 +44,7 @@ typedef struct
     unsigned long int ti_offset;
 } tls_index;
 
+#if 0
 #if defined SE_GNU32
 void * __attribute__((__regparm__(1))) ___tls_get_addr(tls_index *ti)
 #elif defined SE_GNU64
@@ -53,3 +54,4 @@ void *__tls_get_addr(tls_index *ti)
     thread_data_t *thread_data = get_thread_data();
     return (unsigned char *)thread_data->tls_addr + ti->ti_offset;
 }
+#endif

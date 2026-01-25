@@ -35,14 +35,15 @@
 #include "se_event.h"
 
 #include "se_error_internal.h"
+#include "my_thread.h"
 
 /* wait on untrusted event */
-extern "C" int sgx_thread_wait_untrusted_event_ocall(const void *self)
+extern "C" int sgx_thread_wait_untrusted_event_call(const void *self)
 {
     if (self == NULL)
         return SGX_ERROR_INVALID_PARAMETER;
 
-    se_handle_t hevent = CEnclavePool::instance()->get_event(self);
+    se_handle_t hevent = tcs2event((tcs_t *)self);
     if (hevent == NULL)
         return SE_ERROR_MUTEX_GET_EVENT;
 
@@ -53,12 +54,12 @@ extern "C" int sgx_thread_wait_untrusted_event_ocall(const void *self)
 }
 
 /* set untrusted event */
-extern "C" int sgx_thread_set_untrusted_event_ocall(const void *waiter)
+extern "C" int sgx_thread_set_untrusted_event_call(const void *waiter)
 {
     if (waiter == NULL)
         return SGX_ERROR_INVALID_PARAMETER;
 
-    se_handle_t hevent = CEnclavePool::instance()->get_event(waiter);
+    se_handle_t hevent = tcs2event((tcs_t *)waiter);
     if (hevent == NULL)
         return SE_ERROR_MUTEX_GET_EVENT;
 
@@ -68,13 +69,13 @@ extern "C" int sgx_thread_set_untrusted_event_ocall(const void *waiter)
     return SGX_SUCCESS;
 }
 
-extern "C" int sgx_thread_set_multiple_untrusted_events_ocall(const void **waiters, size_t total)
+extern "C" int sgx_thread_set_multiple_untrusted_events_call(const void **waiters, size_t total)
 {
     if (waiters == NULL || *waiters == NULL)
         return SGX_ERROR_INVALID_PARAMETER;
 
     for (unsigned int i = 0; i < total; i++) {
-        se_handle_t hevent = CEnclavePool::instance()->get_event(*waiters++);
+        se_handle_t hevent = tcs2event((tcs_t *)*waiters++);
 
         if (hevent == NULL)
             return SE_ERROR_MUTEX_GET_EVENT;
@@ -86,10 +87,32 @@ extern "C" int sgx_thread_set_multiple_untrusted_events_ocall(const void **waite
     return SGX_SUCCESS;
 }
 
-extern "C" int sgx_thread_setwait_untrusted_events_ocall(const void *waiter, const void *self)
+extern "C" int sgx_thread_setwait_untrusted_events_call(const void *waiter, const void *self)
 {
-    int ret = sgx_thread_set_untrusted_event_ocall(waiter);
+    int ret = sgx_thread_set_untrusted_event_call(waiter);
     if (ret != SGX_SUCCESS) return ret;
 
-    return sgx_thread_wait_untrusted_event_ocall(self);
+    return sgx_thread_wait_untrusted_event_call(self);
+}
+
+/* wait on untrusted event */
+extern "C" int sgx_thread_wait_untrusted_event_ocall(const void *self)
+{
+    return sgx_thread_wait_untrusted_event_call(self);
+}
+
+/* set untrusted event */
+extern "C" int sgx_thread_set_untrusted_event_ocall(const void *waiter)
+{
+    return sgx_thread_set_untrusted_event_call(waiter);
+}
+
+extern "C" int sgx_thread_set_multiple_untrusted_events_ocall(const void **waiters, size_t total)
+{
+    return sgx_thread_set_multiple_untrusted_events_call(waiters,total);
+}
+
+extern "C" int sgx_thread_setwait_untrusted_events_ocall(const void *waiter, const void *self)
+{
+    return sgx_thread_setwait_untrusted_events_call(waiter,self);
 }

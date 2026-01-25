@@ -116,8 +116,10 @@ int sgx_thread_mutex_lock(sgx_thread_mutex_t *mutex)
 
         SPIN_UNLOCK(&mutex->m_lock);
 
-        int err = 0;
-        sgx_thread_wait_untrusted_event_ocall(&err, TD2TCS(self));
+        int err = sgx_thread_wait_untrusted_event_call(TD2TCS(self));
+        if (err != SGX_SUCCESS) {
+          abort();
+        }
     }
 
     /* NOTREACHED */
@@ -220,8 +222,12 @@ int sgx_thread_mutex_unlock(sgx_thread_mutex_t *mutex)
     int ret = sgx_thread_mutex_unlock_lazy(mutex, &waiter);
     if (ret != 0) return ret;
 
-    if (waiter != SGX_THREAD_T_NULL) /* wake the waiter up*/
-        sgx_thread_set_untrusted_event_ocall(&ret, TD2TCS(waiter));
+    if (waiter != SGX_THREAD_T_NULL) /* wake the waiter up*/ {
+      ret = sgx_thread_set_untrusted_event_call(TD2TCS(waiter));
+      if (ret != SGX_SUCCESS) {
+        abort();
+      }
+    }
 
     return 0;
 }
