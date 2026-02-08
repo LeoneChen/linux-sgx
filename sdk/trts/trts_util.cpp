@@ -50,7 +50,7 @@ size_t get_enclave_end(void)
 
 void * get_heap_base(void)
 {
-    return GET_PTR(void, &__ImageBase, g_global_data.heap_offset);
+    return GET_PTR(void, get_enclave_base(), g_global_data.heap_offset);
 }
 
 size_t get_heap_size(void)
@@ -85,7 +85,7 @@ size_t get_heap_min_size(void)
 
 void * get_rsrv_base(void)
 {
-    return GET_PTR(void, &__ImageBase, g_global_data.rsrv_offset);
+    return GET_PTR(void, get_enclave_base(), g_global_data.rsrv_offset);
 }
 
 size_t get_rsrv_end(void)
