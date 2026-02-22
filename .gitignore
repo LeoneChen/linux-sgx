@@ -29,3 +29,12 @@ redist.txt
 # directory created when running reproducibility scripts
 linux/reproducibility/code_dir/
 
+external/rdrand/src/Makefile
+external/rdrand/src/config.h
+external/rdrand/src/config.log
+external/rdrand/src/config.status
+external/rdrand/src/test
+psw/ae/aesm_service/source/core/ipc/messages.pb.*
+sdk/cpprt/linux/libunwind/
+sdk/edger8r/linux/_build/
+sdk/sign_tool/SignTool/sgx_sign

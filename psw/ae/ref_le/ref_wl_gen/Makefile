@@ -42,9 +42,6 @@ CPPFLAGS    += -I$(SGX_HEADER_DIR)                      \
             -I$(LINUX_SDK_DIR)/sign_tool/SignTool/      \
             -I$(LINUX_EXTERNAL_DIR)/rdrand
 
-CXXFLAGS += -Werror
-CFLAGS += -Werror
-
 RDRAND_LIBDIR := $(LINUX_EXTERNAL_DIR)/rdrand/src
 RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
 

@@ -127,7 +127,7 @@ void call_old_handler(int signum, void* siginfo, void *priv)
 void sig_handler_sim(int signum, siginfo_t *siginfo, void *priv) __attribute__((optimize(0))) __attribute__((optimize("no-stack-protector")));
 void sig_handler_sim(int signum, siginfo_t *siginfo, void *priv)
 {
-    GP_ON(signum != SIGFPE && signum != SIGSEGV);
+    GP_ON(signum != SIGFPE && signum != SIGSEGV && signum != SIGALRM);
 
     thread_data_t *thread_data = 0;
     arch_prctl(ARCH_GET_GS, (unsigned long)&thread_data);
@@ -258,6 +258,8 @@ void reg_sig_handler_sim()
     ret = sigaction(SIGSEGV, &sig_act, &g_old_sigact[SIGSEGV]);
     if (0 != ret) abort();
     ret = sigaction(SIGFPE, &sig_act, &g_old_sigact[SIGFPE]);
+    if (0 != ret) abort();
+    ret = sigaction(SIGALRM, &sig_act, &g_old_sigact[SIGALRM]);
     if (0 != ret) abort();
 }
 

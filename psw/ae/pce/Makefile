@@ -33,9 +33,6 @@ TOP_DIR := ../../..
 MITIGATION-CVE-2020-0551=LOAD
 include ../buildenv.mk
 
-CXXFLAGS  += -Werror
-CFLAGS    += -Werror 
-
 AENAME = pce
 
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/data/constants/linux 

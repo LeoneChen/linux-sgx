@@ -278,7 +278,7 @@ static sgx_status_t trts_ecall(uint32_t ordinal, void *ms)
                 }
 
                 //change back the page permission
-                size_t enclave_start = (size_t)&__ImageBase;
+                size_t enclave_start = (size_t)get_enclave_base();
                 if((status = change_protection((void *)enclave_start)) != SGX_SUCCESS)
                 {
                     sgx_spin_unlock(&g_ife_lock);
@@ -360,7 +360,7 @@ sgx_status_t do_init_thread(void *tcs, bool enclave_init)
     uintptr_t tls_addr = 0;
     size_t tdata_size = 0;
 
-    if(0 != GET_TLS_INFO(&__ImageBase, &tls_addr, &tdata_size))
+    if(0 != GET_TLS_INFO(get_enclave_base(), &tls_addr, &tdata_size))
     {
         return SGX_ERROR_UNEXPECTED;
     }

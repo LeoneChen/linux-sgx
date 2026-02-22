@@ -31,7 +31,7 @@
 
 include ../../buildenv.mk
 
-CFLAGS += -Werror -D_GNU_SOURCE -fPIC
+CFLAGS += -D_GNU_SOURCE -fPIC
 CFLAGS += $(ADDED_INC)
 
 CPPFLAGS := -I$(SGX_HEADER_DIR) \

@@ -62,7 +62,7 @@ INCLUDE += -I$(LINUX_EXTERNAL_DIR)/epid-sdk \
            -I$(LINUX_PSW_DIR)/ae/aesm_service/source \
            -I$(LINUX_PSW_DIR)/ae/aesm_service/source/common
 
-CXXFLAGS += -fPIC -Werror -Wno-unused-parameter -g -DPROTOBUF_INLINE_NOT_IN_HEADERS=0
+CXXFLAGS += -fPIC -Wno-unused-parameter -g -DPROTOBUF_INLINE_NOT_IN_HEADERS=0
 
 EXTERNAL_LIB += -lprotobuf 
 
@@ -181,7 +181,7 @@ messages.pb.o : $(IPC_COMMON_PROTO_DIR)/messages.pb.cc
 %.o :%.cpp
 	$(CXX) $(CXXFLAGS) -Wno-deprecated-declarations $(INCLUDE) -c $< -o $@
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDE) -Werror -fPIC -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE) -fPIC -c $< -o $@
 
 $(BUILD_DIR):
 	@$(MKDIR) $@

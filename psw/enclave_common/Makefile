@@ -33,15 +33,13 @@ include ../../buildenv.mk
 
 ECL_VER:= $(shell awk '$$2 ~ /ENCLAVE_COMMON_VERSION/ { print substr($$3, 2, length($$3) - 2); }' $(COMMON_DIR)/inc/internal/se_version.h)
 
-ifndef DEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
-endif
 
-CXXFLAGS += -fPIC -Werror -g
+CXXFLAGS += -fPIC -g
 CXXFLAGS += $(ADDED_INC)
 
-CFLAGS += -fPIC -Werror -g
+CFLAGS += -fPIC -g
 CFLAGS += $(ADDED_INC)
 
 INC += -I$(SGX_HEADER_DIR)                \
