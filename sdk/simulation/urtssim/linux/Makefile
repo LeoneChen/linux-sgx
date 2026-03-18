@@ -36,10 +36,8 @@ URTS_VER:= $(shell awk '$$2 ~ /URTS_VERSION/ { print substr($$3, 2, length($$3) 
 SIM_DIR := $(LINUX_SDK_DIR)/simulation
 VTUNE_DIR = $(LINUX_EXTERNAL_DIR)/vtune/linux
 
-ifndef DEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
-endif
 
 CXXFLAGS += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)
 CFLAGS   += -fPIC -DSE_SIM -Werror -g $(CET_FLAGS)

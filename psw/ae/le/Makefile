@@ -35,9 +35,6 @@ include ../buildenv.mk
 AENAME = launch_enclave
 LE_VER:= $(shell awk '$$2 ~ /LE_VERSION/ { print substr($$3, 2, length($$3) - 2); }' $(COMMON_DIR)/inc/internal/se_version.h)
 
-CFLAGS   += -Werror
-CXXFLAGS += -Werror
-
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/common
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/data/constants/linux 
 INCLUDE += -I$(SGX_HEADER_DIR)/libcxx

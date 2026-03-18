@@ -122,6 +122,7 @@ int EnclaveCreatorSim::add_enclave_page(sgx_enclave_id_t enclave_id, void *src, 
 
 void reg_sig_handler();
 void reg_sig_handler_sim();
+extern "C" __attribute__((weak)) void reg_sgxsan_sigaction();
 int EnclaveCreatorSim::init_enclave(sgx_enclave_id_t enclave_id, enclave_css_t *enclave_css, SGXLaunchToken *lc, le_prd_css_file_t *prd_css_file)
 {
     UNUSED(prd_css_file);
@@ -131,6 +132,8 @@ int EnclaveCreatorSim::init_enclave(sgx_enclave_id_t enclave_id, enclave_css_t *
     if(false == m_sig_registered)
     {
         reg_sig_handler();
+        if (reg_sgxsan_sigaction)
+            reg_sgxsan_sigaction();
         reg_sig_handler_sim();
         m_sig_registered = true;
     }

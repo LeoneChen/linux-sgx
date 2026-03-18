@@ -33,9 +33,6 @@ TOP_DIR := ../../..
 MITIGATION-CVE-2020-0551=LOAD
 include ../buildenv.mk
 
-CXXFLAGS  += -Werror
-CFLAGS    += -Werror 
-
 AENAME = pce
 
 PCE_VER:= $(shell awk '$$2 ~ /PCE/ { print substr($$3, 2, length($$3) - 2); }' $(COMMON_DIR)/inc/internal/se_version.h)

@@ -41,6 +41,12 @@
 #include "urts_emm.h"
 #include "rts_cmd.h"
 #include <assert.h>
+
+// Weak references to SGXSan built-in ocall bridges — only resolved when
+// SGXSanRTApp is linked. Always check for non-null before calling.
+extern "C" sgx_status_t sgxsan_ocall_init_shadow_memory_bridge(void *pms) __attribute__((weak));
+extern "C" sgx_status_t sgxsan_ocall_print_string_bridge(void *pms) __attribute__((weak));
+extern "C" sgx_status_t sgxsan_ocall_addr2line_bridge(void *pms) __attribute__((weak));
 #include "rts.h"
 #include "get_thread_id.h"
 #include "sgx_switchless_itf.h"
@@ -290,6 +296,8 @@ sgx_status_t CEnclave::error_trts2urts(unsigned int trts_error)
     return (sgx_status_t)trts_error;
 }
 
+// Hook: override in fuzzing harness to trigger crash on enclave crash.
+extern "C" __attribute__((weak)) void sgxsan_on_enclave_crashed(void);
 sgx_status_t CEnclave::ecall(const int proc, const void *ocall_table, void *ms, const bool is_switchless)
 {
     if(se_try_rdlock(&m_rwlock))
@@ -396,7 +404,10 @@ sgx_status_t CEnclave::ecall(const int proc, const void *ocall_table, void *ms, 
         {
             se_rdunlock(&m_rwlock);
         }
-        return error_trts2urts(ret);
+        sgx_status_t status = error_trts2urts(ret);
+        if (status == SGX_ERROR_ENCLAVE_CRASHED && sgxsan_on_enclave_crashed)
+          sgxsan_on_enclave_crashed();
+        return status;
     }
     else
     {
@@ -415,6 +426,12 @@ int CEnclave::ocall(const unsigned int proc, const sgx_ocall_table_t *ocall_tabl
             error = ocall_emm_alloc(ms);
         else if ((int)proc == EDMM_MODIFY)
             error = ocall_emm_modify(ms);
+        else if ((int)proc == SGXSAN_OCALL_INIT_SHADOW && sgxsan_ocall_init_shadow_memory_bridge)
+            error = sgxsan_ocall_init_shadow_memory_bridge(ms);
+        else if ((int)proc == SGXSAN_OCALL_PRINT_STRING && sgxsan_ocall_print_string_bridge)
+            error = sgxsan_ocall_print_string_bridge(ms);
+        else if ((int)proc == SGXSAN_OCALL_ADDR2LINE && sgxsan_ocall_addr2line_bridge)
+            error = sgxsan_ocall_addr2line_bridge(ms);
     }
     else 
     {

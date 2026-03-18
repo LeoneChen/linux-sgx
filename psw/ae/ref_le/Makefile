@@ -43,9 +43,6 @@ REF_WL_GEN_DIR   = ./ref_wl_gen
 
 WL_VERSION       = 1
 
-CFLAGS   += -Werror
-CXXFLAGS += -Werror
-
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/common
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/data/constants/linux
 INCLUDE += -I$(LINUX_PSW_DIR)/ae/inc/internal

@@ -33,10 +33,8 @@ include ../../../buildenv.mk
 
 SIM_DIR := $(CUR_DIR)/..
 
-ifndef DEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
-endif
 
 CPPFLAGS += $(ADDED_INC)
 CPPFLAGS += -I$(COMMON_DIR)/inc/         \

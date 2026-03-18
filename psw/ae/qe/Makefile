@@ -55,7 +55,7 @@ SRC += se_sig_rl.cpp                  \
 OBJ := $(SRC:.cpp=.o)
 OBJS := $(sort $(OBJ) version.o)
 
-EPID_FILTER = -Werror -nostdinc -nostdinc++
+EPID_FILTER = -nostdinc -nostdinc++
 EPID_CFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CFLAGS))
 EPID_CXXFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CXXFLAGS))
 

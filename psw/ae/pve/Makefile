@@ -33,8 +33,6 @@ TOP_DIR := ../../..
 MITIGATION-CVE-2020-0551=LOAD
 include ../buildenv.mk
 
-CXXFLAGS  += -Werror
-CFLAGS	  += -Werror 
 AENAME = provision_enclave
 PVE_VER:= $(shell awk '$$2 ~ /PVE_VERSION/ { print substr($$3, 2, length($$3) - 2); }' $(COMMON_DIR)/inc/internal/se_version.h)
 
@@ -58,7 +56,7 @@ OBJS := $(sort $(OBJ) version.o)
 
 AENAME_OUT := $(AENAME).so
 
-EPID_FILTER = -Werror -nostdinc -nostdinc++
+EPID_FILTER = -nostdinc -nostdinc++
 EPID_CFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CFLAGS))
 EPID_CXXFLAGS = $(filter-out $(EPID_FILTER),$(ENCLAVE_CXXFLAGS))
 

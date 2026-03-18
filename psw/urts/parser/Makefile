@@ -49,10 +49,6 @@ TARGET := libenclaveparser.a
 
 CXXFLAGS += -fPIC
 
-ifneq ($(HOST_OS), darwin)
-  CXXFLAGS += -Werror
-endif
-
 CXXFLAGS += -I$(COMMON_DIR)/inc/         \
             -I$(COMMON_DIR)/inc/internal \
             -I.                          \
