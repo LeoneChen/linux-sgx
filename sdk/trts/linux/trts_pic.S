@@ -75,9 +75,11 @@ DECLARE_LOCAL_FUNC lock_enclave
  *     Get the address of thread_data
  * ---------------------------------------------------------------------
  */
+#if 0
 DECLARE_LOCAL_FUNC get_thread_data
     READ_TD_DATA self_addr
     ret
+#endif
 
 /*
  * ---------------------------------------------------------------------

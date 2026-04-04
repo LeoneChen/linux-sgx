@@ -84,6 +84,8 @@ type edger8r_params = {
   gen_trusted   : bool;         (* User specified `--trusted' *)
   untrusted_dir : string;       (* Directory to save untrusted code *)
   trusted_dir   : string;       (* Directory to save trusted code *)
+  export_call_table : bool;
+  gen_harness : bool;
 }
 
 (* The search paths are recored in the array below.
@@ -109,12 +111,14 @@ let rec parse_cmdline (progname: string) (cmdargs: string list) =
   let u_dir    = ref "." in
   let t_dir    = ref "." in
   let files    = ref [] in
+  let export_call_table = ref false in
+  let gen_harness = ref false in
 
   let rec local_parser (args: string list) =
     match args with
         [] -> ()
       | op :: ops ->
-          match String.lowercase op with
+          match String.lowercase_ascii op with
               "--use-prefix" -> use_pref := true; local_parser ops
             | "--header-only"-> hd_only := true; local_parser ops
             | "--untrusted"  -> untrusted := true; local_parser ops
@@ -128,6 +132,12 @@ let rec parse_cmdline (progname: string) (cmdargs: string list) =
                 []    -> usage progname
               | x::xs -> t_dir := x; local_parser xs)
             | "--help" -> usage progname
+            | "--export-call" ->
+                export_call_table := true;
+                local_parser ops
+            | "--gen-harness" ->
+                gen_harness := true;
+                local_parser ops
             | "--search-path" ->
                 if ops = [] then usage progname
                 else
@@ -143,6 +153,8 @@ let rec parse_cmdline (progname: string) (cmdargs: string list) =
       { input_files = List.rev !files; use_prefix = !use_pref;
         header_only = !hd_only; gen_untrusted = true; gen_trusted = true;
         untrusted_dir = !u_dir; trusted_dir = !t_dir;
+        export_call_table = !export_call_table;
+        gen_harness = !gen_harness;
       }
     in
       if !untrusted || !trusted (* User specified '--untrusted' or '--trusted' *)

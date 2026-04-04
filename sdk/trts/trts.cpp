@@ -59,6 +59,7 @@ SGX_ACCESS_VERSION(trts, 1);
 extern uint64_t g_enclave_base;
 extern uint64_t g_enclave_size;
 
+#if 0
 // sgx_is_within_enclave()
 // Parameters:
 //      addr - the start address of the buffer
@@ -228,6 +229,7 @@ void sgx_ocfree()
     }
     ssa_gpr->REG(sp_u) = usp;
 }
+#endif
 
 #ifdef SE_SIM
 static sgx_spinlock_t g_seed_lock = SGX_SPINLOCK_INITIALIZER;

@@ -50,6 +50,7 @@ extern "C" sgx_status_t __morestack(const unsigned int index, void *ms);
 // Return Value:
 //      OCALL status
 //
+#if 0
 sgx_status_t sgx_ocall(const unsigned int index, void *ms)
 {
     // the OCALL index should be within the ocall table range
@@ -65,6 +66,7 @@ sgx_status_t sgx_ocall(const unsigned int index, void *ms)
 
     return status;
 }
+#endif
 
 
 extern "C"

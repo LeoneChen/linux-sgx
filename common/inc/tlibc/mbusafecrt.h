@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include <wchar.h>
 typedef wchar_t WCHAR;
+typedef int errno_t;
 
 #ifdef __cplusplus
     extern "C" {
@@ -77,6 +78,11 @@ extern errno_t memcpy_s( void * dst, size_t sizeInBytes, const void * src, size_
 extern errno_t memcpy_verw_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
 extern errno_t memmove_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
 extern errno_t memmove_verw_s( void * dst, size_t sizeInBytes, const void * src, size_t count );
+
+/// glibc doesn't contain below
+extern errno_t memset_s(void *s, size_t smax, int c, size_t n);
+// extern int consttime_memequal(const void *b1, const void *b2, size_t len);
+size_t strlcpy(char *, const char *, size_t);
 
 #ifdef __cplusplus
     }

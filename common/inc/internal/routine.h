@@ -42,7 +42,7 @@ extern "C" {
 
 typedef struct _ocall_table_t
 {
-    uint32_t count;
+    uint64_t count;
     void *ocall[];
 } sgx_ocall_table_t;
 
