@@ -33,7 +33,7 @@ include ../../../../buildenv.mk
 
 SIM_DIR := $(CUR_DIR)/../..
 
-ifndef DEBUG
+ifndef XDEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
 endif

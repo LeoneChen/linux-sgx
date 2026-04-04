@@ -98,6 +98,9 @@ typedef struct _system_features
 #define BUILTIN_OCALL_4  -5
 #define BUILTIN_OCALL_5  -6
 #define BUILTIN_OCALL_6  -7
+#define BUILTIN_OCALL_7  -8
+#define BUILTIN_OCALL_8  -9
+#define BUILTIN_OCALL_9  -10
 
 typedef enum
 {
@@ -109,8 +112,14 @@ typedef enum
     EDMM_MODIFY = BUILTIN_OCALL_6,
 }edmm_ocall_t;
 
+typedef enum
+{
+    SGXSAN_OCALL_INIT_SHADOW  = BUILTIN_OCALL_7,
+    SGXSAN_OCALL_PRINT_STRING = BUILTIN_OCALL_8,
+    SGXSAN_OCALL_ADDR2LINE    = BUILTIN_OCALL_9,
+}sgxsan_ocall_t;
 
-#define is_builtin_ocall(ocall_val) (((int)ocall_val >= BUILTIN_OCALL_6) && ((int)ocall_val <= BUILTIN_OCALL_1))
+#define is_builtin_ocall(ocall_val) (((int)ocall_val >= BUILTIN_OCALL_9) && ((int)ocall_val <= BUILTIN_OCALL_1))
 
 #pragma pack(pop)
 

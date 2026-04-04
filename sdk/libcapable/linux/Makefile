@@ -31,7 +31,7 @@
 
 include ../../../buildenv.mk
 
-ifndef DEBUG
+ifndef XDEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
 endif

@@ -543,6 +543,17 @@ sgx_status_t do_uninit_enclave(void *tcs)
     // Set uninit_flag to indicate the do_uninit_enclave is called
     __sync_or_and_fetch(&g_uninit_flag, 1);
 
+    // EnclaveFuzz: call uninit_global_object() BEFORE mm_dealloc loop.
+    // mm_dealloc OCALLs use EDMM (enclave_modify/mprotect) which can corrupt
+    // the current thread's trusted stack, making subsequent OCALLs crash.
+    // Destructors (e.g. dump_sancov) must run while the stack is still intact.
+    sgx_spin_lock(&g_ife_lock);
+    if (!g_is_first_ecall)
+    {
+        uninit_global_object();
+    }
+    sgx_spin_unlock(&g_ife_lock);
+
     tcs_node_t *tcs_node = g_tcs_node;
     g_tcs_node = NULL;
     while (tcs_node != NULL)
@@ -568,13 +579,6 @@ sgx_status_t do_uninit_enclave(void *tcs)
         tcs_node = tcs_node->next;
         free(tmp);
     }
-
-    sgx_spin_lock(&g_ife_lock);
-    if (!g_is_first_ecall)
-    {
-        uninit_global_object();
-    }
-    sgx_spin_unlock(&g_ife_lock);
 #else
     UNUSED(tcs);
 #endif    

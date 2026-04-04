@@ -33,7 +33,7 @@ include ../../buildenv.mk
 
 ECL_VER:= $(shell awk '$$2 ~ /ENCLAVE_COMMON_VERSION/ { print substr($$3, 2, length($$3) - 2); }' $(COMMON_DIR)/inc/internal/se_version.h)
 
-ifndef DEBUG
+ifndef XDEBUG
 CXXFLAGS += -DDISABLE_TRACE
 CFLAGS += -DDISABLE_TRACE
 endif
